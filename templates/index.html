@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情感识别多模态分析平台</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6e7dff, #4caf50), url('{{ url_for('static', filename='1.jpg') }}'); /* 渐变背景和图片组合 */
+            background-size: cover; /* 背景图片覆盖整个屏幕 */
+            background-position: center center; /* 背景图片居中 */
+            background-attachment: fixed; /* 固定背景图片 */
+            color: #333;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;  /* 让页面至少占满屏幕高度 */
+            position: relative;
+        }
+
+        /* 在页面内容上增加半透明的遮罩层，防止文字被背景图遮挡 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3); /* 黑色透明遮罩，调节透明度可以使背景图更淡 */
+            z-index: -1; /* 确保遮罩层在所有内容下面 */
+        }
+
+        h1 {
+            background-color: rgba(76, 175, 80, 0.7); /* 背景色稍微带点透明度 */
+            color: white;
+            padding: 30px 0;
+            margin: 0;
+            font-size: 2.8em;
+            border-bottom: 4px solid #333;
+        }
+
+        .content {
+            margin: 40px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9); /* 白色背景并加一点透明度 */
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .content p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* 卡片样式 */
+        .card-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: nowrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            width: 280px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 1em;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: auto;
+        }
+
+        .card a:hover {
+            background-color: #333;
+            transform: translateY(-5px);
+        }
+
+        /* 颜色不同的卡片 */
+        .card-1 {
+            background-color: rgba(144, 238, 144, 0.3); /* 淡绿色 */
+        }
+
+        .card-2 {
+            background-color: rgba(135, 206, 235, 0.3); /* 淡天蓝 */
+        }
+
+        .card-3 {
+            background-color: rgba(255, 223, 186, 0.3); /* 淡橙色 */
+        }
+
+        /* 页脚样式 */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            font-size: 1em;
+            text-align: center;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* 适应小屏幕 */
+        @media (max-width: 768px) {
+            .content {
+                width: 90%;
+            }
+
+            .card {
+                width: 250px;
+                padding: 20px;
+            }
+
+            .card-container {
+                gap: 20px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .card {
+                width: 200px;
+                padding: 15px;
+            }
+
+            .card-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .card a {
+                font-size: 1em;
+                padding: 10px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>情感识别多模态系统</h1>
+    <div class="content">
+        <h2>欢迎来到情感识别多模态系统！</h2>
+        <p>通过本系统，您可以进行数据采集、分析与结果展示。请选择以下功能卡片来开始操作。</p>
+
+        <!-- 卡片容器 -->
+        <div class="card-container">
+            <div class="card card-1">
+                <h3>数据采集</h3>
+                <p>收集视频和音频数据，开始情感分析的第一步。</p>
+                <a href="/data_collection">开始数据采集</a>
+            </div>
+            <div class="card card-2">
+                <h3>数据分析</h3>
+                <p>上传数据进行分析，得到情感识别的结果。</p>
+                <a href="/data_analysis">进行数据分析</a>
+            </div>
+            <div class="card card-3">
+                <h3>结果展示</h3>
+                <p>查看分析结果，展示情感分类和相关信息。</p>
+                <a href="/result_display">查看分析结果</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 情感识别多模态系统. 版权所有.</p>
+    </footer>
+</body>
+</html>

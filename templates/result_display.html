@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结果展示</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            background-color: #0078d7;
+            color: white;
+            padding: 20px 0;
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* 修改“情绪”列的宽度 */
+        table th:nth-child(2), table td:nth-child(2) {
+            min-width: 150px; /* 设置最小宽度，使得“情绪”列足够宽 */
+        }
+
+        table th {
+            background-color: #0078d7;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #e0f7fa;
+        }
+
+        .back-button {
+            text-decoration: none;
+            background-color: #0078d7;
+            color: white;
+            padding: 10px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <h1>结果展示</h1>
+    <div class="container">
+        <h2>历次情绪分析结果</h2>
+        <table id="history-table">
+            <thead>
+                <tr>
+                    <th>分析时间</th>
+                    <th>情绪</th>
+                    <th>建议</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 历史记录会动态填充在这里 -->
+            </tbody>
+        </table>
+    </div>
+    <a href="/" class="back-button">返回主页</a>
+
+    <script>
+        async function loadHistory() {
+            try {
+                const response = await fetch('/get_history');
+                const data = await response.json();
+
+                if (response.ok) {
+                    const tableBody = document.querySelector('#history-table tbody');
+                    tableBody.innerHTML = ''; // 清空表格内容
+
+                    // 动态填充表格
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.date}</td>
+                            <td>${item.emotion}</td>
+                            <td>${item.suggestion}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    alert('无法加载历史记录：' + data.error);
+                }
+            } catch (error) {
+                console.error('加载历史记录失败:', error);
+                alert('加载历史记录时发生错误。');
+            }
+        }
+
+        // 页面加载时，自动调用函数获取历史记录
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>

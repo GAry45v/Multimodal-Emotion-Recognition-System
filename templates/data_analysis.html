@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据分析</title>
+<style>
+/* 全局样式 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1 {
+    background-color: #0078d7;
+    color: white;
+    padding: 20px 0;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 2.5em;
+}
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 1000px;
+}
+/* 左侧部分 */
+.left-section {
+    width: 45%;
+}
+.left-section label {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    display: block;
+}
+.left-section input[type="file"] {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.left-section button {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.left-section button:hover {
+    background-color: #005bb5;
+}
+/* 右侧部分 */
+.right-section {
+    width: 50%;
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.right-section h2 {
+    margin-top: 0;
+}
+.right-section p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+/* 返回主页按钮 */
+.back-button {
+    text-decoration: none;
+    background-color: #0078d7;
+    color: white;
+    padding: 10px 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease;
+}
+.back-button:hover {
+    background-color: #005bb5;
+}
+
+/* 输入框部分样式 */
+.gpt-section {
+    width: 80%;
+    max-width: 1000px;
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.gpt-section input[type="text"] {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.gpt-section button {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.gpt-section button:hover {
+    background-color: #005bb5;
+}
+.gpt-response {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #333;
+}
+</style>
+</head>
+<body>
+    <h1>数据分析</h1>
+    <div class="container">
+        <!-- 左侧：上传视频文件 + 按钮 -->
+        <div class="left-section">
+            <label for="video-upload">上传视频文件：</label>
+            <input type="file" id="video-upload" accept="video/*"><br><br>
+            <button onclick="startAnalysis()">开始分析</button>
+        </div>
+        <!-- 右侧：显示分析结果 -->
+        <div class="right-section">
+            <h2>分析结果</h2>
+            <p><strong>情绪：</strong>待分析</p>
+            <p><strong>建议：</strong>请上传视频并点击“开始分析”。</p>
+        </div>
+    </div>
+
+    <!-- GPT 输入框与交互 -->
+    <div class="gpt-section">
+        <h2>最近遇到了什么心理上的困难?</h2>
+        <input type="text" id="gpt-input" placeholder="输入你的问题...">
+        <button onclick="askGPT()">确认</button>
+        <div class="gpt-response" id="gpt-response"></div>
+    </div>
+
+    <a href="/" class="back-button">返回主页</a>
+
+    <script>
+        async function startAnalysis() {
+            const videoInput = document.getElementById('video-upload');
+            const videoFile = videoInput.files[0];
+
+            if (!videoFile) {
+                alert("请先上传一个视频文件！");
+                return;
+            }
+
+            // 创建 FormData 对象
+            const formData = new FormData();
+            formData.append('video', videoFile);
+
+            try {
+                // 显示加载提示
+                document.querySelector('.right-section').innerHTML = `<h2>分析结果</h2><p>分析中，请稍候...</p>`;
+
+                // 发送 POST 请求到后端
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert("分析失败: " + errorData.error);
+                    return;
+                }
+
+                // 解析返回的 JSON 数据
+                const data = await response.json();
+
+                // 获取情绪和建议
+                const emotion = data.emotion || '未知';
+                const suggestion = data.suggestion || '暂无建议';
+
+                // 显示情绪和建议
+                document.querySelector('.right-section').innerHTML = `
+                    <h2>分析结果</h2>
+                    <p><strong>情绪：</strong>${emotion}</p>
+                    <p><strong>建议：</strong>${suggestion}</p>
+                `;
+            } catch (error) {
+                console.error('错误:', error);
+                alert("分析过程中发生错误。");
+                document.querySelector('.right-section').innerHTML = `
+                    <h2>分析结果</h2>
+                    <p><strong>情绪：</strong>待分析</p>
+                    <p><strong>建议：</strong>请上传视频并点击“开始分析”。</p>
+                `;
+            }
+        }
+
+        async function askGPT() {
+    const userInput = document.getElementById('gpt-input').value.trim();
+    if (!userInput) {
+        alert("请输入问题！");
+        return;
+    }
+    // 显示加载提示
+    document.getElementById('gpt-response').innerHTML = "正在获取回答...";
+    try {
+        const response = await fetch('/ask_gpt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_query: userInput }) // 使用 user_query 而不是 prompt
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert("GPT API 请求失败: " + errorData.error);
+            return;
+        }
+        const data = await response.json();
+        document.getElementById('gpt-response').innerHTML = data.answer || "没有返回内容。";
+    } catch (error) {
+        console.error('错误:', error);
+        document.getElementById('gpt-response').innerHTML = "发生错误，请稍后再试。";
+        }
+    }
+    </script>
+</body>
+</html>
